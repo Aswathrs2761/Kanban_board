@@ -1,14 +1,14 @@
+import { useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
-import TaskModal from "./TaskModal";
 import { useTasks } from "../store/TaskContext";
+import TaskModal from "./TaskModal";   // ✅ EDIT dialog ONLY
 
 export default function TaskCard({ task }) {
   const { deleteTask } = useTasks();
-  const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { setNodeRef, listeners, attributes, transform, transition } =
     useDraggable({
       id: task.id,
     });
@@ -23,36 +23,31 @@ export default function TaskCard({ task }) {
       <div
         ref={setNodeRef}
         style={style}
-        className="relative rounded-2xl p-4 border bg-gradient-to-br from-white to-slate-50 shadow-sm hover:shadow-md transition"
+        className="rounded-2xl p-4 border bg-gradient-to-br from-white to-slate-50 shadow-sm"
       >
-        {/* Drag handle */}
         <div
           {...listeners}
           {...attributes}
-          className="cursor-grab active:cursor-grabbing mb-2 flex items-center gap-2 text-slate-400 text-xs"
+          className="cursor-grab text-xs text-slate-400 mb-2"
         >
-          <span className="text-base">⋮⋮</span>
-          Drag
+          ⋮⋮ Drag
         </div>
 
-        <h3 className="font-semibold text-slate-800 mb-1">
-          {task.title}
-        </h3>
+        <h3 className="font-semibold mb-1">{task.title}</h3>
 
         <p className="text-sm text-slate-600 line-clamp-2 mb-3">
           {task.description}
         </p>
 
-        {/* badges */}
-        <div className="flex gap-2 flex-wrap mb-4">
+        <div className="flex gap-2 mb-4">
           {task.tag && (
-            <span className="px-2.5 py-0.5 text-xs rounded-full bg-violet-100 text-violet-700 font-medium">
+            <span className="px-2 py-0.5 text-xs rounded-full bg-violet-100 text-violet-700">
               {task.tag}
             </span>
           )}
 
           <span
-            className={`px-2.5 py-0.5 text-xs rounded-full font-medium
+            className={`px-2 py-0.5 text-xs rounded-full
               ${
                 task.priority === "High"
                   ? "bg-rose-100 text-rose-700"
@@ -65,12 +60,12 @@ export default function TaskCard({ task }) {
           </span>
         </div>
 
-        {/* actions */}
         <div className="flex justify-end gap-2">
+          {/* ✅ EDIT */}
           <button
             type="button"
-            onClick={() => setOpen(true)}
-            className="text-xs px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium"
+            onClick={() => setOpenEdit(true)}
+            className="text-xs px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700"
           >
             Edit
           </button>
@@ -78,14 +73,20 @@ export default function TaskCard({ task }) {
           <button
             type="button"
             onClick={() => deleteTask(task.id)}
-            className="text-xs px-3 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium"
+            className="text-xs px-3 py-1 rounded-lg bg-rose-50 text-rose-700"
           >
             Delete
           </button>
         </div>
       </div>
 
-      {open && <TaskModal task={task} onClose={() => setOpen(false)} />}
+      {/* ✅ ONLY edit modal here */}
+      {openEdit && (
+        <TaskModal
+          task={task}
+          onClose={() => setOpenEdit(false)}
+        />
+      )}
     </>
   );
 }

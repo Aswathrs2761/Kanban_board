@@ -1,42 +1,31 @@
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import Column from "./Column";
+import { DndContext } from "@dnd-kit/core";
 import { useTasks } from "../store/TaskContext";
+import Column from "./Column";
 
 const columns = [
-  { id: "todo", title: "To Do", color: "border-blue-400" },
-  { id: "inprogress", title: "In Progress", color: "border-yellow-400" },
-  { id: "done", title: "Done", color: "border-green-400" },
+  { id: "todo", title: "To Do" },
+  { id: "inprogress", title: "In Progress" },
+  { id: "done", title: "Done" },
 ];
 
 export default function Board() {
-  const { tasks, moveTask } = useTasks();
+  const { tasks, updateTask } = useTasks();
 
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  function handleDragEnd(event) {
-    const { active, over } = event;
-
+  function onDragEnd(e) {
+    const { active, over } = e;
     if (!over) return;
 
-    const taskId = active.id;
-    const newStatus = over.id;
-
-    moveTask(taskId, newStatus);
+    updateTask(active.id, { status: over.id });
   }
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={onDragEnd}>
       <div className="grid md:grid-cols-3 gap-6">
-        {columns.map((col) => (
+        {columns.map((c) => (
           <Column
-            key={col.id}
-            column={col}
-            tasks={tasks.filter((t) => t.status === col.id)}
+            key={c.id}
+            column={c}
+            tasks={tasks.filter((t) => t.status === c.id)}
           />
         ))}
       </div>

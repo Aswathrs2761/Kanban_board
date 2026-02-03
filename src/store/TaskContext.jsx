@@ -2,42 +2,25 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
 const TaskContext = createContext();
+export const useTasks = () => useContext(TaskContext);
 
-const STORAGE_KEY = "kanban_tasks_v1";
+const STORAGE_KEY = "kanban_tasks";
 
-const initialTasks = [
+const demo = [
   {
     id: uuid(),
     title: "Design new dashboard layout",
     description:
-      "Create wireframes and mockups for the new analytics dashboard with charts and KPIs.",
+      "Create wireframes and mockups for the new analytics dashboard.",
     status: "todo",
     tag: "Feature",
     priority: "High",
-  },
-  {
-    id: uuid(),
-    title: "Implement authentication flow",
-    description:
-      "Set up user login, registration, and password reset functionality using JWT tokens.",
-    status: "todo",
-    tag: "Feature",
-    priority: "High",
-  },
-  {
-    id: uuid(),
-    title: "Research API rate limiting",
-    description:
-      "Investigate best practices for implementing API rate limiting to prevent abuse.",
-    status: "inprogress",
-    tag: "Research",
-    priority: "Medium",
   },
   {
     id: uuid(),
     title: "Fix mobile navigation bug",
     description:
-      "The hamburger menu doesn't close properly on iOS devices after navigation.",
+      "The hamburger menu doesn't close properly on iOS devices.",
     status: "inprogress",
     tag: "Bug",
     priority: "Medium",
@@ -55,8 +38,8 @@ const initialTasks = [
 
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useState(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : initialTasks;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : demo;
   });
 
   useEffect(() => {
@@ -64,30 +47,24 @@ export function TaskProvider({ children }) {
   }, [tasks]);
 
   const addTask = (task) => {
-    setTasks((prev) => [...prev, { ...task, id: uuid() }]);
+    setTasks((p) => [...p, { ...task, id: uuid() }]);
   };
 
   const updateTask = (id, updates) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+    setTasks((p) =>
+      p.map((t) => (t.id === id ? { ...t, ...updates } : t))
     );
   };
 
   const deleteTask = (id) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const moveTask = (id, status) => {
-    updateTask(id, { status });
+    setTasks((p) => p.filter((t) => t.id !== id));
   };
 
   return (
     <TaskContext.Provider
-      value={{ tasks, addTask, updateTask, deleteTask, moveTask }}
+      value={{ tasks, addTask, updateTask, deleteTask }}
     >
       {children}
     </TaskContext.Provider>
   );
 }
-
-export const useTasks = () => useContext(TaskContext);
